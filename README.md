@@ -2,7 +2,7 @@
 
 A minimal static site for CS 5610 with a 5×5 mini crossword built in HTML and CSS only.
 
-**Live site:** _add the GitHub Pages URL here_
+**Live site:** https://zixial3.github.io/the-arcade/
 
 ## Structure
 
