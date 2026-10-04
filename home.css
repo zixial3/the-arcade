@@ -1,0 +1,20 @@
+/* Landing page */
+
+.home__play {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  font-weight: 300;
+}
+
+.home__preview {
+  width: 10rem;
+  transition: transform var(--transition);
+}
+
+.home__play:hover .home__preview {
+  transform: translateY(-3px);
+}

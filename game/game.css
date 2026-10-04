@@ -1,0 +1,277 @@
+/* Puzzle page */
+
+.puzzle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   Grid — the dark board shows through 1px gaps as the rule lines
+   -------------------------------------------------------------------------- */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  width: min(100%, 20rem);
+  border: 1px solid var(--color-ink);
+  background-color: var(--color-ink);
+}
+
+.cell {
+  position: relative;
+  min-width: var(--tap-target);
+  aspect-ratio: 1;
+  background-color: var(--color-bg);
+  transition: background-color var(--transition);
+}
+
+.cell--block {
+  background-color: var(--color-ink);
+}
+
+.cell__number {
+  position: absolute;
+  top: 0.15rem;
+  left: 0.25rem;
+  z-index: 2;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.cell__input {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0.3em 0 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--color-ink);
+  caret-color: var(--color-accent);
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cell__input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  background-color: var(--color-accent-wash);
+}
+
+/* Answer letters, shown while "reveal" is open */
+.cell__answer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-top: 0.3em;
+  background-color: var(--color-bg);
+  color: var(--color-accent);
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+
+.puzzle:has(.reveal[open]) .cell__answer {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Highlight the across word and both clues of the focused square */
+.puzzle:has([data-across="1"] .cell__input:focus) [data-across="1"],
+.puzzle:has([data-across="4"] .cell__input:focus) [data-across="4"],
+.puzzle:has([data-across="5"] .cell__input:focus) [data-across="5"],
+.puzzle:has([data-across="6"] .cell__input:focus) [data-across="6"],
+.puzzle:has([data-across="7"] .cell__input:focus) [data-across="7"] {
+  background-color: var(--color-wash);
+}
+
+.puzzle:has([data-across="1"] .cell__input:focus) #clue-a1,
+.puzzle:has([data-across="4"] .cell__input:focus) #clue-a4,
+.puzzle:has([data-across="5"] .cell__input:focus) #clue-a5,
+.puzzle:has([data-across="6"] .cell__input:focus) #clue-a6,
+.puzzle:has([data-across="7"] .cell__input:focus) #clue-a7,
+.puzzle:has([data-down="1"] .cell__input:focus) #clue-d1,
+.puzzle:has([data-down="2"] .cell__input:focus) #clue-d2,
+.puzzle:has([data-down="3"] .cell__input:focus) #clue-d3,
+.puzzle:has([data-down="4"] .cell__input:focus) #clue-d4,
+.puzzle:has([data-down="5"] .cell__input:focus) #clue-d5 {
+  background-color: var(--color-accent-wash);
+}
+
+/* --------------------------------------------------------------------------
+   Check — each input's pattern attribute holds its answer
+   -------------------------------------------------------------------------- */
+
+.puzzle:has(#check-answers:checked) .cell__input:not(:placeholder-shown):valid {
+  color: var(--color-success);
+}
+
+.puzzle:has(#check-answers:checked) .cell__input:invalid {
+  color: var(--color-error);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.puzzle:has(#check-answers:checked) .cell:has(.cell__input:not(:placeholder-shown):valid)::after,
+.puzzle:has(#check-answers:checked) .cell:has(.cell__input:invalid)::after {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.1rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.puzzle:has(#check-answers:checked) .cell:has(.cell__input:not(:placeholder-shown):valid)::after {
+  content: "✓";
+  content: "✓" / "";
+  color: var(--color-success);
+}
+
+.puzzle:has(#check-answers:checked) .cell:has(.cell__input:invalid)::after {
+  content: "✗";
+  content: "✗" / "";
+  color: var(--color-error);
+}
+
+/* Solved: nothing empty, nothing wrong */
+.puzzle__solved {
+  display: none;
+  color: var(--color-success);
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+}
+
+.board:not(:has(.cell__input:placeholder-shown)):not(:has(.cell__input:invalid)) ~ .puzzle__solved {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Controls — plain words, like the nav
+   -------------------------------------------------------------------------- */
+
+.puzzle__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-5);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  font-weight: 300;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.control:hover {
+  color: var(--color-accent);
+}
+
+.control__checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.control:has(.control__checkbox:checked),
+.reveal[open] > .control {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.reveal > summary {
+  list-style: none;
+}
+
+.reveal > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The written key is for screen readers; sighted players see the grid fill in */
+.reveal__key {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Clues
+   -------------------------------------------------------------------------- */
+
+.clues {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-3);
+}
+
+@media (min-width: 30rem) {
+  .clues {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+}
+
+.clues__group h3 {
+  margin-bottom: var(--space-2);
+}
+
+.clue-list {
+  list-style: none;
+}
+
+.clue {
+  transition: background-color var(--transition);
+}
+
+.clue__label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-2);
+  cursor: pointer;
+}
+
+.clue__label:hover {
+  color: var(--color-accent);
+}
+
+.clue__number {
+  min-width: 1rem;
+  color: var(--color-muted);
+}
+
+.clue__length {
+  color: var(--color-muted);
+}
